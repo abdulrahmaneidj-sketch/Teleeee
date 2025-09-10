@@ -2,24 +2,27 @@ import os
 import telebot
 import google.generativeai as genai
 
-# Variables
+# 🟢 جلب المتغيرات من Railway Variables
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Telegram bot
+# 🟢 تهيئة التوكنات
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-
-# Gemini setup
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-pro")
 
+# 🟢 اختيار موديل Gemini
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+# 🟢 استقبال أي رسالة من المستخدم
 @bot.message_handler(func=lambda message: True)
-def reply_to_user(message):
+def handle_message(message):
     try:
-        response = model.generate_content(message.text)
+        prompt = message.text
+        response = model.generate_content(prompt)
         bot.reply_to(message, response.text)
     except Exception as e:
-        bot.reply_to(message, f"خطأ: {e}")
+        bot.reply_to(message, f"آسف، صار خطأ: {e}")
 
-print("البوت شغال مع Gemini ...")
-bot.polling()
+# 🟢 تشغيل البوت
+print("✅ البوت شغال ...")
+bot.infinity_polling()
